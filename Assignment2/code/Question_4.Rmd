@@ -1,0 +1,183 @@
+---
+title: "Question4"
+author: "Pawan Kumar"
+date: '2022-11-16'
+output:
+  pdf_document:
+    latex_engine: xelatex
+  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 4**
+
+### *Part -A: We want to predict the Claims as function of Holders. So we want to fit the following models:*
+                
+Claims $i=β^0 + β^1$ $Holders_{i} + ε_{i}$ , $i = 1,2,··· ,n$
+Assume : $ε_{i}$ ∼ N(0,$σ^{2}$ ). Note that $β^{0} ,β^{1}$ ∈ R and $σ\in R^{+}$.
+
+The above model can alse be re-expressed as,
+                       $Claims_{i} ∼ N(µ_{i},σ^{2} )$, where
+                       $µ_{i} = β^{0} + β^{1} Holders_{i} + ε_{i}$ , $i = 1,2,··· ,n$
+
+(i) Clearly write down the negative-log-likelihood function in R. Then use optim function to estimate MLE of $θ = (β^{0} ,β^{1} ,σ)$
+(ii) Calculate Bayesian Information Criterion (BIC) for the model.
+
+```{r}
+
+library(SciViews)
+library(MASS)
+H=Insurance$Holders
+C=Insurance$Claims
+
+k=length(H)
+Loglikelihood <- function(pars,y)
+{
+  lf= 0
+  for(i in 1:k)
+  {
+    lf=lf+dnorm(y[,1][i],mean = pars[1]+(pars[2]*y[,2][i]),sd=exp(pars[3]),log = TRUE)
+  }
+  return(-lf)
+}
+
+d = optim(c(0,1,50),Loglikelihood,y=data.frame(cbind(C,H)))
+d
+BIC=ln(k)*(length(d$par))+2*d$value 
+BIC
+plot(C~H)
+abline(d$par[1],d$par[2],col='green')
+
+```
+
+### *Part -B: Now we want to fit the same model with change in distribution:*
+
+                  
+Claims $i=β^0+β^1  Holders_{i} + ε^{i}$ , $i = 1,2,··· ,n$
+Assume : $ε_{i} ∼ Laplace(0,σ^2)$. Note that $β^0 , β^1 \in R$ and $σ \in R^{+ }$.
+(i) Clearly write down the negative-log-likelihood function in R. Then use optim function to estimate MLE of θ = (β 0 ,β 1 ,σ)
+(ii) Calculate Bayesian Information Criterion (BIC) for the model.
+
+
+```{r}
+rm(list=ls())
+library(MASS)
+plot(Insurance$Holders,Insurance$Claims
+     ,xlab =
+       'Holders'
+     ,ylab=
+       'Claims'
+     ,pch=
+       20
+)
+grid()
+attach(Insurance)
+data=Insurance
+data=data.frame(cbind(Claims,Holders))
+
+
+
+library(SciViews)
+library(jmuOutlier)
+library(MASS)
+H=Insurance$Holders
+C=Insurance$Claims
+
+Loglaplace <- function(theta,data){
+  lf=0
+  n=nrow(data)
+  for(i in 1:n){
+    lf=lf+log(dlaplace(data[,1][i]-theta[1]-theta[2]*data[,2][i],0,(theta[3])))
+    
+  }
+  return(-lf)
+}
+
+b2=optim(c(9,0.1,50),Loglaplace,data=data)
+b2
+n=nrow(data)
+BIC2=log(n)*(3)-2*(-1*b2$value)
+BIC2
+plot(log(Insurance$Claims)~log(Insurance$Holders))
+abline(b2$par[1],b2$par[2],col='red')
+
+```
+
+### *Part - C: We want to fit the following models*
+
+$Claims_{i} ∼ LogNormal(µ_{i},σ^{2} )$,where
+$µ_{i} = β^{0} + β^{1} log(Holders_{i} )$, $i = 1,2,...,n$
+Note that $β^{0} ,β^{1} \in R$ and $σ \in R^{+}$ .
+
+```{r}
+library(SciViews)
+library(jmuOutlier)
+library(MASS)
+
+
+data=data.frame(cbind(Insurance$Claims,Insurance$Holders))
+data = data[-61,]
+n=length(Insurance$Holders)-1
+
+LogNormal=function(pars,data)
+{
+  lf=0
+  for(i in 1:n)
+  {
+    lf=lf+log(dlnorm(data[,1][i] , pars[1]+pars[2]*log(data[,2][i]), pars[3]))
+  }
+  return(-lf)
+}
+
+
+
+d3=optim(c(1,0,1),LogNormal,data=data)
+d3
+BIC3=ln(n)*(length(d3$par))-2*ln(d3$value)
+BIC3
+
+plot(log(Insurance$Claims)~log(Insurance$Holders))
+abline(d3$par[1],d3$par[2],col= 'blue')
+
+```
+
+### *Part - D: We want to fit the following models:*
+
+$Claims_{i} ∼ Gamma(α_{i} ,σ)$,where
+$log(α_{i} ) = β_{0} + β_{1} log(Holders_{i} )$, $i = 1,2,...,n$
+(iii) Compare the BIC of all three models
+
+```{r}
+library(SciViews)
+library(jmuOutlier)
+library(MASS)
+
+data=data.frame(cbind(Insurance$Claims,Insurance$Holders))
+data = data[-61,]
+n=length(Holders)-1
+
+LogGamma=function(pars,data)
+{
+  lf=0
+  for(i in 1:n)
+  {
+    lf=lf+log(dgamma(data[,1][i] , exp(pars[1]+pars[2]*log(data[,2][i])), scale = pars[3]))
+    
+  }
+  return(-lf)
+}
+
+
+d4=optim(c(-3,0.11,1),LogGamma,data=data)
+d4
+BIC4=ln(n)*(length(d4$par))-2*ln(d4$value)
+BIC4
+plot(log(Insurance$Claims)~log(Insurance$Holders))
+abline(d4$par[1],d4$par[2],col="violet")
+
+
+```
+
