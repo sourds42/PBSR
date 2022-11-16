@@ -1,0 +1,187 @@
+---
+title: "Assignment 2 Question1"
+author: "Anurag"
+date: "2022-11-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Question 1
+```{r}
+
+library(tinytex)
+library(kableExtra)
+```
+
+
+
+Suppose X denote the number of goals scored by home team in premier league. We can assume X is a
+random variable. Then we have to build the probability distribution to model the probability of number
+of goals. Since X takes value in N = {0, 1, 2, · · · }, we can consider the geometric progression sequence as
+possible candidate model, i.e
+$$
+S =\left \{ a,ar^2,ar^3,\cdot \cdot \cdot \cdot \cdot  \right \}
+$$
+But we have to be careful and put proper conditions in place and modify S in such a way so that it becomes
+proper probability distributions\br
+
+1) Figure out the necesary conditions and define the probability distribution model using S.\br
+
+
+```{r}
+x=c(0,1,2,3)
+Probability=c("a","ar","ar^2","ar^3")
+Distribution_table=data.frame(x,Probability)
+
+```
+
+```{r}
+kable(Distribution_table,"pipe",align=c("r","r"),table.attr = "class=\"striped\"")
+
+```
+under the consideration $\\\left | r \right |<=1$
+
+$$
+\sum_{k=0}^{}(ar^k)=1\\
+\frac{a}{1-r}=1\\
+a=1-r\\
+a+r=1\\
+$$
+
+2)Check if mean and variance exists for the probability model\br
+
+To check the existance of $E(X)$:(By Usiing Dalemberts Ratio test)
+
+
+$$
+E(x)=\sum_{k=0}^{inf}k(ar^k)\\
+\lim_{n->inf}\frac{(n+1))ar^(n+1)}{(n)ar^n}\\
+=\ r*\lim_{n->inf}(1+\frac{1}{n})\\
+\
+=\ r
+$$
+
+
+We already know that $\\\left | r \right |<=1$ .Thus through
+D alemberts ratio test for infinite series we can say that $E(X)$ exists
+
+To check the existance of $E(X^2)$:(By Usiing Dalemberts Ratio test)
+
+$$
+E(x^2)=\sum_{k=0}^{inf}k^2(ar^k)\\
+\lim_{n->inf}\frac{(n+1)^2ar^(n+1)}{(n)^2ar^n}\\
+=\ r*\lim_{n->inf}(1+\frac{1}{n^2})\\
+\
+=\ r
+$$
+We already know that $\\\left | r \right |<=1$ .Thus through
+D alemberts ratio test for infinite series we can say that $E(X)$ exists
+
+To check the existance of $E(X^2)$:(By Usiing Dalemberts Ratio test)
+
+$$
+E(x^2)=\sum_{k=0}^{inf}k^2(ar^k)\\
+\lim_{n->inf}\frac{(n+1)^2ar^(n+1)}{(n)^2ar^n}\\
+=\ r*\lim_{n->inf}(1+\frac{1}{n^2})\\
+\
+=\ r
+$$
+$E(X^2)$:\br
+
+$$
+E(x^2)=\sum_{k=0}^{inf}k^2(ar^k)\\
+=\ ar+4(ar^2)+9(ar^3)+\cdot \cdot \cdot \cdot\\
+=\ ar(1+r)(1-r)^-3
+$$
+
+$V(X)=E(X^2)-(E(X))^2$ 
+
+$$
+V(X)=ar(1+r)^-3-a^2r^2(1-r)^-4
+$$
+4)From historical data we found the following summary statistics\br
+Using the summary statistics and your newly defined probability distribution model find the following:
+ a. What is the probability that home team will score at least one goal?\br
+
+ b. What is the probability that home team will score at least one goal but less than four goal?
+ 
+We have three equations
+$$
+\\V(X)=9/4\\
+\\E(X)=3/2\\
+\\a+r=1\\
+$$
+From the three equations we compute the value of a=2/5 and r=3/5
+
+Probability that the team will score atleast one goal
+
+```{r}
+geom=function(a,r,n){
+  ans=0
+  for (i in 0:n){
+    ans=ans+a*(r)^i
+  }
+  return (ans)
+}
+```
+
+
+```{r}
+1-geom(2/5,3/5,0)
+```
+
+
+Probability that the team will score atleast one goal but less than 4 goals
+
+```{r}
+geom(2/5,3/5,3)-geom(2/5,3/5,0)
+```
+5. Suppose on another thought you want to model it with off-the shelf Poisson probability models. Under the assumption that underlying distribution is Poisson probability find the above probabilities, i.e.,
+ a. What is the probability that home team will score at least one goal?
+ b. What is the probability that home team will score at least one goal but less than four goal?
+ 
+```{r}
+pois=function(lambda,n){
+  
+  ans=0
+  for (i in 0:n){
+    ans=ans+((exp(-lambda))*(lambda)^i)/factorial(i)
+  }
+  return (ans)
+}
+```
+ 
+```{r}
+1-pois(3/2,0)
+```
+```{r}
+pois(3/2,3)-pois(3/2,0)
+```
+6. Which probability model you would prefer over another?
+
+I would prefer the geometric model over the poisson model because n ie the no of goals scored cannot be infinitely large and as calculated the r is not indefinitely small.
+
+
+7.Write down the likelihood functions of your newly defined probability models and Poisson models. Clearly mention all the assumptions that you are making.
+
+geometric model
+
+$$
+L_1(x)=\prod_{i=0}^{n}f(x_i)\\
+\ = a^nr^{\sum_{i=1}^{n}x_i}
+$$
+
+Poisson model
+$$
+L_2(x)=\prod_{i=0}^{n}f(x_i)\\
+\ =e^(-n\lambda)\frac{\lambda^(\sum_{i=1}^{n}x_i)}{\prod_{i=1}^{n}x_i}
+$$
+
+Assumptions:
+1) random variable $x_1$,$x-2$,..... are iid's \
+2) $\\\left | r \right |<=1$ \
+
+
