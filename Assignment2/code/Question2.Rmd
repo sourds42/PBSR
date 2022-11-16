@@ -1,0 +1,235 @@
+---
+title: "Question_2"
+author: "Pawan Kumar"
+date: '2022-11-15'
+output: 
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+## **Problem 2**
+
+### *Q.1. Write a function in R which will compute the MLE of θ = log(α) using* 
+    *optim function in R. You can name it MyMLE*
+
+
+
+MyMLE <- function(pars,y){
+  alpha <- pars[1]
+  sigma <- pars[2]
+  logl <- sum(-log(gamma(alpha))-alpha*log(sigma)+(alpha-1)*log(y)-y/sigma)
+  return(-logl)
+}
+optim(pars,MyMLE,y)
+
+
+
+### *Q.2 Choose n=20, and alpha=1.5 and sigma=2.2*
+
+1. *(i).  Simulate {X1 ,X2 ,··· ,Xn } from  rgamma(n=20,shape=1.5,scale=2.2)*
+1. *(ii). Apply the MyMLE to estimate θ and append the value in a vector*
+1. *(iii) Repeat the step (i) and (ii) 1000 times*
+1. *(iv) Draw histogram of the estimated MLEs of θ.*
+1. *(v) Draw a vertical line using abline function at the true value of θ*
+1. *(vi) Check if the gap between 2.5 and 97.5-percentile points are shrinking* 
+   *as sample size n is increasing?*
+
+```{r}
+rgamma(n=20,shape=1.5,scale=2.2)  #simulation of data for particular given 
+#values of respective parameters
+
+
+MyMLE <- function(pars,y){
+  alpha <- pars[1]
+  sigma <- pars[2]
+  logl <- sum(-log(gamma(alpha))-alpha*log(sigma)+(alpha-1)*log(y)-y/sigma)
+  return(-logl)
+}
+optim(c(1.5,2.2),MyMLE,y = rgamma(n=20,shape=1.5,scale=2.2)) #MyMLE function
+
+
+ne<- function(x){
+  MyMLE <- function(pars,y){
+    alpha <- pars[1]
+    sigma <- pars[2]
+    logl <- sum(-log(gamma(alpha))-alpha*log(sigma)+(alpha-1)*log(y)-y/sigma)
+    return(-logl)
+  }
+  optim(c(1.5,2.2),MyMLE,y = rgamma(n=20,shape=1.5,scale=2.2))
+}
+
+
+n <- 1000
+#give 1 to function new n times
+dat <- lapply(rep(1,n),ne)
+#replicate 1000 times
+#re1000 <- replicate(n, ne(1), simplify=FALSE)
+#head(re1000)
+#making a dummy function 
+lap <- lapply(seq_len(n), function(x) ne(1))
+head(lap)
+
+v <- c()
+for(i in 1:1000){
+  v <- append(v,dat[[i]][[1]][1])
+}                                 #repetation of MyMLE 1000 times and 
+#appending vector for corresponding value of theta
+
+head(v)    #pulling few data
+
+hist(v)    #plotting histogram
+
+abline(v = 1.5,col='blue') # for drawing vertical line using abline function
+
+
+quant = quantile(v, probs = c(2.5/100,97.5/100))
+diff = quant[2]-quant[1]
+paste('2.5 percentile point is', quant[1])
+paste("97.5 percentile point is ", quant[2])
+paste(" The gap between 2.5 and 97.5-percentile for n=20, and alpha=1.5 and sigma=2.2 is ",diff)
+
+```
+
+
+### *Q.3 Choose n=40, and alpha=1.5 and repeat the (2).*
+
+```{r}
+rgamma(n=40,shape=1.5,scale=2.2)  #simulation of data for particular given 
+#values ofrespective parameters
+
+MyMLE <- function(pars,y){
+  alpha <- pars[1]
+  sigma <- pars[2]
+  logl <- sum(-log(gamma(alpha))-alpha*log(sigma)+(alpha-1)*log(y)-y/sigma)
+  return(-logl)
+}
+optim(c(1.5,2.2),MyMLE,y = rgamma(n=40,shape=1.5,scale=2.2)) #MyMLE function for 
+#particular given values of respective parameters
+
+
+ne<- function(x){
+  MyMLE <- function(pars,y){
+    alpha <- pars[1]
+    sigma <- pars[2]
+    logl <- sum(-log(gamma(alpha))-alpha*log(sigma)+(alpha-1)*log(y)-y/sigma)
+    return(-logl)
+  }
+  optim(c(1.5,2.2),MyMLE,y = rgamma(n=40,shape=1.5,scale=2.2))
+}
+
+
+n <- 1000
+#give 1 to function new n times
+dat <- lapply(rep(1,n),ne)
+#replicate 1000 times
+#replicate(n, ne(1), simplify=FALSE)
+#making a dummy function 
+lap1 <- lapply(seq_len(n), function(x) ne(1))
+head(lap1)
+
+
+v <- c()
+for(i in 1:1000){
+  v <- append(v,dat[[i]][[1]][1])
+}                           #repetation of MyMLE 1000 times and 
+#appending vector for corresponding value of theta.     
+
+
+head(v) #pulling few data
+
+hist(v)  #plotting histogram
+
+
+
+abline(v = 1.5,col='blue')   # for drawing vertical line using abline function
+
+
+
+quant = quantile(v, probs = c(2.5/100,97.5/100))
+diff = quant[2]-quant[1]
+paste('2.5 percentile point is', quant[1])
+paste("97.5 percentile point is ", quant[2])
+paste(" The gap between 2.5 and 97.5-percentile for n=40, and alpha=1.5 and 
+      sigma=2.2 is ",diff)
+
+```
+
+
+### *Q.4 Choose n=100, and alpha=1.5 and repeat the (2).*
+
+```{r}
+rgamma(n=100,shape=1.5,scale=2.2)#simulation of data for particular given values 
+#of respective parameters
+
+MyMLE <- function(pars,y){
+  alpha <- pars[1]
+  sigma <- pars[2]
+  logl <- sum(-log(gamma(alpha))-alpha*log(sigma)+(alpha-1)*log(y)-y/sigma)
+  return(-logl)
+}
+optim(c(1.5,2.2),MyMLE,y = rgamma(n=100,shape=1.5,scale=2.2))  # MyMLE function 
+#for particular given values of parameters
+
+
+
+
+ne<- function(x){
+  MyMLE <- function(pars,y){
+    alpha <- pars[1]
+    sigma <- pars[2]
+    logl <- sum(-log(gamma(alpha))-alpha*log(sigma)+(alpha-1)*log(y)-y/sigma)
+    return(-logl)
+  }
+  optim(c(1.5,2.2),MyMLE,y = rgamma(n=100,shape=1.5,scale=2.2))
+}
+
+
+n <- 1000
+#give 1 to function new n times
+dat <- lapply(rep(1,n),ne)
+#replicate 1000 times
+#replicate(n, ne(1), simplify=FALSE)
+#making a dummy function 
+lap2 <- lapply(seq_len(n), function(x) ne(1))
+head(lap2)
+
+
+v <- c()
+for(i in 1:1000){
+  v <- append(v,dat[[i]][[1]][1])
+}                                  #repetation of MyMLE 1000 times and 
+#appending vector for corresponding value of theta.      
+
+
+head(v) #pulling only few data
+
+hist(v)  #plotting histogram
+
+
+
+abline(v = 1.5,col='blue')  #drawing vertical line using abline function
+
+
+
+quant = quantile(v, probs = c(2.5/100,97.5/100))
+diff = quant[2]-quant[1]
+paste('2.5 percentile point is', quant[1])
+paste("97.5 percentile point is ", quant[2])
+paste(" The gap between 2.5 and 97.5-percentile for n=100, and alpha=1.5 and sigma=2.2 is ",diff)
+
+```
+
+
+### *Q.5  Check if the gap between 2.5 and 97.5-percentile points are shrinking*
+*as sample size n is increasing?*
+
+* For n =20, the gap is approx. ~2.2154
+  for n = 40, the gap is approx. ~1.2814
+  for n = 100, the gap is approx. ~0.8006
+  it turns out the gap between 2.5 and 97.5 percentile points is shrinking as 
+  the sample size increases.
